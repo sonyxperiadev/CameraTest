@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">CameraTest</string>
+
+    <string name="multi_camera">Multi Camera</string>
+    <string name="multi_camera_desc">Allow opening multiple cameras simultaneously.</string>
+    <string name="multi_camera_cam_name">Camera %d</string>
+    <string name="multi_camera_info">Info</string>
+
+    <string name="parallel_capture">Parallel Capture</string>
+    <string name="parallel_capture_desc">Allow simultaneous capture requests on a single stream.</string>
+
+    <string name="zsl_reprocess">ZSL (Reprocessing)</string>
+    <string name="zsl_reprocess_desc">Google-style Zero Shutter Lag</string>
+    <string name="zsl_reprocess_capture">Shoot.</string>
+
+    <string name="test_mode">Test Mode</string>
+</resources>

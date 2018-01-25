@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <Button
+        android:id="@+id/btnDualCamera"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:onClick="ButtonClick"
+        android:text="@string/multi_camera" />
+
+    <Button
+        android:id="@+id/btnParallelCapture"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:onClick="ButtonClick"
+        android:text="@string/parallel_capture" />
+
+    <Button
+        android:id="@+id/btnZslReprocess"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:onClick="ButtonClick"
+        android:text="@string/zsl_reprocess"/>
+
+    <Button
+        android:id="@+id/btnTestMode"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:onClick="ButtonClick"
+        android:text="@string/test_mode"/>
+
+    <TextView
+        android:id="@+id/txtCameraList"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:text="" />
+</LinearLayout>
