@@ -230,7 +230,7 @@ public class TestModeActivity extends Activity {
         }
     }
 
-    void btnTestModeClick(View v) {
+    public void btnTestModeClick(View v) {
         if(!ready)
             return;
 
