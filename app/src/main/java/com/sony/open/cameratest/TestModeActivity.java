@@ -1,6 +1,6 @@
 /**
  * Copyright (c) 2018, Sony Mobile Communications Inc.
- * All rights reserved.
+ * Licensed under the LICENSE.
  */
 package com.sony.open.cameratest;
 
