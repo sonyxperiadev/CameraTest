@@ -15,16 +15,31 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+
 public class MainActivity extends Activity {
+    /* permissions to request */
+    private final static String[] wantedPermissions = {
+            Manifest.permission.CAMERA,
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        /* request camera permission if needed */
-        if(checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-            Toast.makeText(this, "Missing CAMERA permission.", Toast.LENGTH_SHORT).show();
-            requestPermissions(new String[] { Manifest.permission.CAMERA }, 0);
+        /* list missing permissions */
+        ArrayList<String> permissionList = new ArrayList<>();
+        for(String perm : wantedPermissions) {
+            if(checkSelfPermission(perm) != PackageManager.PERMISSION_GRANTED) {
+                permissionList.add(perm);
+            }
+        }
+
+        /* request missing permissions */
+        if(permissionList.size() != 0) {
+            String[] perms = permissionList.toArray(new String[permissionList.size()]);
+            requestPermissions(perms, 0);
         }
 
         /* show list of cameras */

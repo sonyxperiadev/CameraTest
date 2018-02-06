@@ -4,8 +4,10 @@
  */
 package com.sony.open.cameratest;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.hardware.camera2.CameraCaptureSession;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraManager;
@@ -22,6 +24,7 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -173,6 +176,13 @@ public class MultiCameraActivity extends Activity {
         }
 
         if(index <= 0) {
+            return;
+        }
+
+        // reject request and notify user if camera permission missing
+        if(checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            selCams[cam].setSelection(0);
+            Toast.makeText(this, "Camera permission not granted.", Toast.LENGTH_SHORT).show();
             return;
         }
 

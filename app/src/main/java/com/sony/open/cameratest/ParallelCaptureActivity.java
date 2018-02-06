@@ -4,8 +4,10 @@
  */
 package com.sony.open.cameratest;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
@@ -36,6 +38,7 @@ import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -167,6 +170,14 @@ public class ParallelCaptureActivity extends Activity {
         // reset stuff
         logList.clear();
         preview_capture = 0;
+
+        // reject request and notify user if camera permission missing
+        if(checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            Spinner sel = findViewById(R.id.selParallelCaptureCamera);
+            sel.setSelection(0);
+            Toast.makeText(this, "Camera permission not granted.", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
         // open new camera
         try {

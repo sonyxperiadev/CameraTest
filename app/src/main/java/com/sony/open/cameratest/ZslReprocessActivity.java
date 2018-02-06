@@ -4,10 +4,12 @@
  */
 package com.sony.open.cameratest;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
@@ -34,6 +36,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import java.nio.ByteBuffer;
@@ -83,6 +86,12 @@ public class ZslReprocessActivity extends Activity {
 
         Button btnCapture = findViewById(R.id.btnZslReprocessCapture);
         btnCapture.setEnabled(false);
+
+        // finish activity and notify user if camera permission missing
+        if(checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            Toast.makeText(this, "Camera permission not granted.", Toast.LENGTH_SHORT).show();
+            finish();
+        }
 
         // check camera and decide capture size
         try {

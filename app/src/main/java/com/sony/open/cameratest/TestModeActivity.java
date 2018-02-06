@@ -4,8 +4,10 @@
  */
 package com.sony.open.cameratest;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.graphics.ImageFormat;
 import android.graphics.SurfaceTexture;
 import android.hardware.camera2.CameraCaptureSession;
@@ -26,6 +28,7 @@ import android.util.Size;
 import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
+import android.widget.Toast;
 
 import java.util.Locale;
 import java.util.Vector;
@@ -58,6 +61,12 @@ public class TestModeActivity extends Activity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_test_mode);
+
+        // finish activity and notify user if camera permission missing
+        if(checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            Toast.makeText(this, "Camera permission not granted.", Toast.LENGTH_SHORT).show();
+            finish();
+        }
 
         try {
             camManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
