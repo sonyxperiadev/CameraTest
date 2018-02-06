@@ -41,24 +41,6 @@ public class MainActivity extends Activity {
             String[] perms = permissionList.toArray(new String[permissionList.size()]);
             requestPermissions(perms, 0);
         }
-
-        /* show list of cameras */
-        try {
-            CameraManager camManager = (CameraManager)getSystemService(Context.CAMERA_SERVICE);
-            String[] cameraIds = camManager.getCameraIdList();
-
-            String camList = "List of cameras:";
-            for(String id : cameraIds) {
-                camList += "\n\tCameraId '" + id + "'";
-            }
-
-            TextView txtCameraList = findViewById(R.id.txtCameraList);
-            txtCameraList.setText(camList);
-
-        } catch(Exception e) {
-            Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-            finish();
-        }
     }
 
     /* button handler */
