@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (c) 2018, Sony Mobile Communications Inc.
  * Licensed under the LICENSE.
  */
