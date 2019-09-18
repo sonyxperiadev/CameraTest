@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-    Copyright (c) 2018, Sony Mobile Communications Inc.
+    Copyright (c) 2019, Sony Mobile Communications Inc.
     Licensed under the LICENSE.
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
@@ -38,6 +38,10 @@
         <activity
             android:name=".ZslReprocessActivity"
             android:label="@string/zsl_reprocess"
+            android:parentActivityName=".MainActivity" />
+        <activity
+            android:name=".HighSpeedActivity"
+            android:label="@string/high_speed"
             android:parentActivityName=".MainActivity" />
         <activity
             android:name=".TestModeActivity"

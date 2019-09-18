@@ -7,6 +7,7 @@ package com.sony.open.cameratest
 import android.app.AlertDialog
 import android.content.Context
 import android.hardware.camera2.CameraCaptureSession
+import android.hardware.camera2.CameraConstrainedHighSpeedCaptureSession
 import android.hardware.camera2.CameraDevice
 import android.hardware.camera2.CameraManager
 import android.util.Log
@@ -54,6 +55,20 @@ class CameraHelper(private val cameraManager : CameraManager) {
     // close camera - returns nothing
     fun closeCamera(device : CameraDevice?) {
         device?.close()
+    }
+
+    // create ConstrainedHighSpeedCaptureSession - returns CameraConstrainedHighSpeedCaptureSession or null on failure
+    suspend fun createHighSpeedSession(device : CameraDevice, surfaces : List<Surface>): CameraConstrainedHighSpeedCaptureSession? = suspendCoroutine { cont ->
+        val cb = object : CameraCaptureSession.StateCallback() {
+            override fun onConfigured(session: CameraCaptureSession) {
+                cont.resume(session as CameraConstrainedHighSpeedCaptureSession)
+            }
+
+            override fun onConfigureFailed(session: CameraCaptureSession) {
+                cont.resume(null)
+            }
+        }
+        device.createConstrainedHighSpeedCaptureSession(surfaces, cb, null)
     }
 
     // show AlertDialog - return selection index or null on failure

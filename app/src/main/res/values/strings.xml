@@ -13,5 +13,7 @@
     <string name="zsl_reprocess_desc">Google-style Zero Shutter Lag</string>
     <string name="zsl_reprocess_capture">Shoot.</string>
 
+    <string name="high_speed">High Speed Capture</string>
+
     <string name="test_mode">Test Mode</string>
 </resources>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (c) 2019, Sony Mobile Communications Inc.
+    Licensed under the LICENSE.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/mainActivityLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+            <Button
+                android:id="@+id/btnHighSpeedSession"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:onClick="btnHighSpeedSessionClick"
+                android:text="Start/Stop Session" />
+
+            <CheckBox
+                android:id="@+id/chkHighSpeedRecording"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Allow recording" />
+    </LinearLayout>
+
+    <TextureView
+        android:id="@+id/tvHighSpeedPreview"
+        android:layout_width="match_parent"
+        android:layout_height="40dp" />
+
+    <Button
+        android:id="@+id/btnHighSpeedRecording"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="btnHighSpeedRecordingClick"
+        android:text="Start/Stop Recording"
+        android:enabled="false" />
+
+</LinearLayout>
