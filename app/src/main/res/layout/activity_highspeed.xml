@@ -12,20 +12,33 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-            <Button
-                android:id="@+id/btnHighSpeedSession"
+        <Button
+            android:id="@+id/btnHighSpeedSession"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:onClick="btnHighSpeedSessionClick"
+            android:text="Start/Stop Session" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <CheckBox
+                android:id="@+id/chkHighSpeedPreview"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:onClick="btnHighSpeedSessionClick"
-                android:text="Start/Stop Session" />
+                android:text="Enable preview"
+                android:checked="true" />
 
             <CheckBox
                 android:id="@+id/chkHighSpeedRecording"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:text="Allow recording" />
+        </LinearLayout>
     </LinearLayout>
 
     <TextureView

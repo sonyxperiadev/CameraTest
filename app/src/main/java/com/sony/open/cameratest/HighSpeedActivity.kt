@@ -73,6 +73,7 @@ class HighSpeedActivity : Activity() {
             cameraSession?.close()
             cameraSession = null
             cameraHelper.closeCamera(cameraDevice)
+            chkHighSpeedPreview.isEnabled = true
             chkHighSpeedRecording.isEnabled = true
             Toast.makeText(this@HighSpeedActivity, "Camera closed.", Toast.LENGTH_SHORT).show()
             return
@@ -118,28 +119,38 @@ class HighSpeedActivity : Activity() {
             }
             cameraDevice = device
 
-            // scale preview to aspect - very ugly
-            val screenSize = Point()
-            windowManager.defaultDisplay.getSize(screenSize)
-            val lParams = tvHighSpeedPreview.layoutParams
-            if(screenSize.x > screenSize.y) {
-                lParams.width = (screenSize.y * size.first.height) / size.first.width
-                lParams.height = screenSize.y
-            } else {
-                lParams.width = screenSize.x
-                lParams.height = (screenSize.x * size.first.width) / size.first.height
-            }
-            tvHighSpeedPreview.layoutParams = lParams
-            delay(250)
-
             // prepare preview surface
-            tvHighSpeedPreview.surfaceTexture.setDefaultBufferSize(size.first.width, size.first.height)
-            surfaces.add(Surface(tvHighSpeedPreview.surfaceTexture))
+            if(chkHighSpeedPreview.isChecked) {
+                // scale preview to aspect - very ugly
+                val screenSize = Point()
+                windowManager.defaultDisplay.getSize(screenSize)
+                val lParams = tvHighSpeedPreview.layoutParams
+                if(screenSize.x > screenSize.y) {
+                    lParams.width = (screenSize.y * size.first.height) / size.first.width
+                    lParams.height = screenSize.y
+                } else {
+                    lParams.width = screenSize.x
+                    lParams.height = (screenSize.x * size.first.width) / size.first.height
+                }
+                tvHighSpeedPreview.layoutParams = lParams
+                delay(250)
+
+                // add preview surface
+                tvHighSpeedPreview.surfaceTexture.setDefaultBufferSize(size.first.width, size.first.height)
+                surfaces.add(Surface(tvHighSpeedPreview.surfaceTexture))
+            }
 
             // prepare recording - not supported
             if(chkHighSpeedRecording.isChecked) {
                 Toast.makeText(this@HighSpeedActivity, "recording not implemented", Toast.LENGTH_SHORT).show()
                 chkHighSpeedRecording.isChecked = false
+            }
+
+            // fail if no surfaces enabled
+            if(surfaces.size == 0) {
+                Toast.makeText(this@HighSpeedActivity, "No surfaces enabled.", Toast.LENGTH_LONG).show()
+                cameraHelper.closeCamera(cameraDevice)
+                return@launch
             }
 
             // create camera session
@@ -149,6 +160,7 @@ class HighSpeedActivity : Activity() {
                 return@launch
             }
             cameraSession = session
+            chkHighSpeedPreview.isEnabled = false
             chkHighSpeedRecording.isEnabled = false
 
             // create repeating high speed request list
