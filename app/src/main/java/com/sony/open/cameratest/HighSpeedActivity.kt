@@ -8,7 +8,9 @@ import android.app.Activity
 import android.content.Context
 import android.graphics.Point
 import android.hardware.camera2.*
+import android.media.MediaRecorder
 import android.os.Bundle
+import android.os.Environment
 import android.util.Range
 import android.util.Size
 import android.view.Surface
@@ -21,10 +23,13 @@ import kotlinx.coroutines.*
 class HighSpeedActivity : Activity() {
     private val cameraManager by lazy { getSystemService(Context.CAMERA_SERVICE) as CameraManager}
     private val cameraHelper by lazy { CameraHelper(cameraManager) }
+    private val mediaRecorder by lazy { MediaRecorder() }
 
     private var cameraDevice : CameraDevice? = null
     private var cameraSession : CameraConstrainedHighSpeedCaptureSession? = null
     private var cameraId : String? = null
+
+    private val fileName = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).absolutePath + "/CameraTest_HighSpeed.mp4"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -70,12 +75,25 @@ class HighSpeedActivity : Activity() {
     fun btnHighSpeedSessionClick(v : View) {
         // if there is an active session, close it and return
         if(cameraSession != null) {
+            // stop recording
+            if(chkHighSpeedRecording.isChecked) {
+                mediaRecorder.stop()
+            }
+
+            // close session and camera
             cameraSession?.close()
             cameraSession = null
             cameraHelper.closeCamera(cameraDevice)
+
+            var text = "Camera closed."
+            if(chkHighSpeedRecording.isChecked) {
+                text += " Recording saved as $fileName."
+            }
+            Toast.makeText(this@HighSpeedActivity, text, Toast.LENGTH_SHORT).show()
+
+            // update UI
             chkHighSpeedPreview.isEnabled = true
             chkHighSpeedRecording.isEnabled = true
-            Toast.makeText(this@HighSpeedActivity, "Camera closed.", Toast.LENGTH_SHORT).show()
             return
         }
 
@@ -140,10 +158,17 @@ class HighSpeedActivity : Activity() {
                 surfaces.add(Surface(tvHighSpeedPreview.surfaceTexture))
             }
 
-            // prepare recording - not supported
+            // prepare recording surface
             if(chkHighSpeedRecording.isChecked) {
-                Toast.makeText(this@HighSpeedActivity, "recording not implemented", Toast.LENGTH_SHORT).show()
-                chkHighSpeedRecording.isChecked = false
+                mediaRecorder.reset()
+                mediaRecorder.setVideoSource(MediaRecorder.VideoSource.SURFACE)
+                mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
+                mediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264)
+                mediaRecorder.setOutputFile(fileName)
+                mediaRecorder.setVideoSize(size.first.width, size.first.height)
+                mediaRecorder.setVideoEncodingBitRate((size.first.width*size.first.height*size.second.lower) / 15)
+                mediaRecorder.prepare()
+                surfaces.add(mediaRecorder.surface)
             }
 
             // fail if no surfaces enabled
@@ -174,6 +199,11 @@ class HighSpeedActivity : Activity() {
             session.setRepeatingBurst(reqList, object : CameraCaptureSession.CaptureCallback() {
                 // nothing to override
             }, null)
+
+            // start recording
+            if(chkHighSpeedRecording.isChecked) {
+                mediaRecorder.start()
+            }
 
             Toast.makeText(this@HighSpeedActivity, "Ready: Camera ${device.id}, ${size.first.width}x${size.first.height}, ${size.second.lower} fps.", Toast.LENGTH_SHORT).show()
         }

@@ -46,12 +46,4 @@
         android:layout_width="match_parent"
         android:layout_height="40dp" />
 
-    <Button
-        android:id="@+id/btnHighSpeedRecording"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:onClick="btnHighSpeedRecordingClick"
-        android:text="Start/Stop Recording"
-        android:enabled="false" />
-
 </LinearLayout>

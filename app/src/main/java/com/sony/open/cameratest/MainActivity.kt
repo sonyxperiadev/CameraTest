@@ -27,7 +27,8 @@ class MainActivity : Activity() {
     }
 
     private val permissions = listOf(
-            Manifest.permission.CAMERA
+            Manifest.permission.CAMERA,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
     )
 
     override fun onCreate(savedInstanceState : Bundle?) {
