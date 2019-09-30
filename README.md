@@ -11,8 +11,6 @@ The Camera2 API allows multiple cameras to be opened simultaneously,
 which this module allows the user to do. Each open camera runs a
 TEMPLATE\_PREVIEW repeating request outputting into a TextureView.
 
-Change _numCams_ to reflect the maximum number of cameras supported.
-
 ## Parallel Capture
 
 Within a single camera session, multiple requests can be issued, e.g.

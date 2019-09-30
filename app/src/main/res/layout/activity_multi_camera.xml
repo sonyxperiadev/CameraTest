@@ -1,38 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-    Copyright (c) 2018, Sony Mobile Communications Inc.
+    Copyright (c) 2019, Sony Mobile Communications Inc.
     Licensed under the LICENSE.
 -->
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/llMultiCameraRoot"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
-
-    <TextView
-        android:id="@+id/txtMultiCameraDesc"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textAlignment="center"
-        android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium"
-        android:text="@string/multi_camera_desc" />
-
-    <LinearLayout
-        android:id="@+id/lCams"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="horizontal"
-        android:layout_weight="1" />
-
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="1">
-
-        <TextView
-            android:id="@+id/txtMultiCameraLog"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-    </ScrollView>
-
 </LinearLayout>

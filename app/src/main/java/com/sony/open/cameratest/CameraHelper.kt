@@ -10,11 +10,8 @@ import android.hardware.camera2.CameraCaptureSession
 import android.hardware.camera2.CameraConstrainedHighSpeedCaptureSession
 import android.hardware.camera2.CameraDevice
 import android.hardware.camera2.CameraManager
-import android.util.Log
 import android.view.Surface
-import java.lang.Exception
 import kotlin.coroutines.resume
-import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
 class CameraHelper(private val cameraManager : CameraManager) {
@@ -40,7 +37,7 @@ class CameraHelper(private val cameraManager : CameraManager) {
             override fun onError(camera: CameraDevice, error: Int) {
                 if(!isDone) {
                     isDone = true
-                    cont.resumeWithException(Exception("openCamera failed: error $error"))
+                    cont.resume(null)
                 }
             }
         }
@@ -55,6 +52,20 @@ class CameraHelper(private val cameraManager : CameraManager) {
     // close camera - returns nothing
     fun closeCamera(device : CameraDevice?) {
         device?.close()
+    }
+
+    // create CaptureSession - returns CameraCaptureSession or null on failure
+    suspend fun createCaptureSession(device : CameraDevice, surfaces : List<Surface>): CameraCaptureSession? = suspendCoroutine { cont ->
+        val cb = object : CameraCaptureSession.StateCallback() {
+            override fun onConfigured(session: CameraCaptureSession) {
+                cont.resume(session)
+            }
+
+            override fun onConfigureFailed(p0: CameraCaptureSession) {
+                cont.resume(null)
+            }
+        }
+        device.createCaptureSession(surfaces, cb, null)
     }
 
     // create ConstrainedHighSpeedCaptureSession - returns CameraConstrainedHighSpeedCaptureSession or null on failure
