@@ -35,6 +35,18 @@ high-resolution images (TEMPLATE\_ZERO\_SHUTTER\_LAG), and
 reprocessing only images to be kept. This mode of operation is
 exercised by this module.
 
+## High Speed Capture
+
+If a Camera Device supports the CONSTRAINED\_HIGH\_SPEED capability,
+it supports a special operating mode to capture at high frame rates
+(>= 120 fps). This module uses this mode to preview and/or record
+at high frame rates. Preview and recording always share the frame rate.
+
+Camera device, resolution and frame rates are chosen by the user
+if there are multiple choices. Recorded videos are saved in
+CameraTest\_HighSpeed.mp4 in the DCIM folder. This function
+requires the WRITE\_EXTERNAL\_STORAGE permission.
+
 ## Test Mode
 
 This module is used for testing.
