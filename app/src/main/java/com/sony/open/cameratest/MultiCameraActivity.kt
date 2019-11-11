@@ -102,7 +102,7 @@ class MultiCameraActivity : Activity() {
 
         // prepare preview - very ugly
         val lParams = data.tvPreview.layoutParams
-        lParams.width = (data.tvPreview.measuredHeight * size.width)/size.height
+        lParams.width = (data.tvPreview.measuredHeight * size.height)/size.width
         data.tvPreview.layoutParams = lParams
         delay(250)
         data.tvPreview.surfaceTexture.setDefaultBufferSize(size.width, size.height)
