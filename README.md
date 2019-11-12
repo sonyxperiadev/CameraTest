@@ -45,6 +45,18 @@ if there are multiple choices. Recorded videos are saved in
 CameraTest\_HighSpeed.mp4 in the DCIM folder. This function
 requires the WRITE\_EXTERNAL\_STORAGE permission.
 
+## Actuator Test
+
+This module allows the user to manually set the focus distance,
+or to sweep it from infinity to macro and back.
+
+A camera device needs to have the MANUAL\_SENSOR capability,
+a positive minimum focus distance (a movable lens) and the
+ability to manually control the lens position. If multiple such
+devices are available, the user gets to choose.
+
+Currently, the device must also support a 1280x720 resolution.
+
 ## Test Mode
 
 This module is used for testing.

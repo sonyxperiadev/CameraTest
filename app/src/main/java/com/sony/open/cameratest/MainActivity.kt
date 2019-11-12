@@ -22,6 +22,7 @@ class MainActivity : Activity() {
             Pair(getString(R.string.parallel_capture), ParallelCaptureActivity::class.java),
             Pair(getString(R.string.zsl_reprocess), ZslReprocessActivity::class.java),
             Pair(getString(R.string.high_speed), HighSpeedActivity::class.java),
+            Pair(getString(R.string.actuator_test), ActuatorTestActivity::class.java),
             Pair(getString(R.string.test_mode), TestModeActivity::class.java)
         )
     }

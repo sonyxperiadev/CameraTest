@@ -45,6 +45,10 @@
             android:label="@string/high_speed"
             android:parentActivityName=".MainActivity" />
         <activity
+            android:name=".ActuatorTestActivity"
+            android:label="@string/actuator_test"
+            android:parentActivityName=".MainActivity" />
+        <activity
             android:name=".TestModeActivity"
             android:label="@string/test_mode"
             android:parentActivityName=".MainActivity" />
