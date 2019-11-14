@@ -66,6 +66,15 @@ class HighSpeedActivity : Activity() {
         }
     }
 
+    override fun onPause() {
+        super.onPause()
+
+        // stop camera session on pause
+        if(cameraSession != null) {
+            btnHighSpeedSessionClick(btnHighSpeedSession)
+        }
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         cameraSession?.close()
