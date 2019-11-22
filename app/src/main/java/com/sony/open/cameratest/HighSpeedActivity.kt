@@ -31,6 +31,9 @@ class HighSpeedActivity : Activity() {
 
     private val fileName = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).absolutePath + "/CameraTest_HighSpeed.mp4"
 
+    private var lastFrameTs : Long = -1
+    private var avgFps : Long = -1
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_highspeed)
@@ -81,6 +84,30 @@ class HighSpeedActivity : Activity() {
         cameraHelper.closeCamera(cameraDevice)
     }
 
+    fun updateFps(newTs : Long) : Long {
+        val weight = 128
+
+        // initialize first timestamp
+        if (lastFrameTs < 0) {
+            lastFrameTs = newTs
+            return -1
+        }
+
+        // initialize first result
+        val curFps = 1000000000 / (newTs - lastFrameTs)
+        if (avgFps < 0) {
+            avgFps = curFps*weight
+            return curFps
+        }
+
+        // smooth and return value
+        avgFps -= avgFps/weight
+        avgFps += curFps
+        lastFrameTs = newTs
+        return avgFps/weight
+    }
+
+    @Suppress("UNUSED_PARAMETER")
     fun btnHighSpeedSessionClick(v : View) {
         // if there is an active session, close it and return
         if(cameraSession != null) {
@@ -100,9 +127,11 @@ class HighSpeedActivity : Activity() {
             }
             Toast.makeText(this@HighSpeedActivity, text, Toast.LENGTH_SHORT).show()
 
-            // update UI
+            // update UI and FPS state
             chkHighSpeedPreview.isEnabled = true
             chkHighSpeedRecording.isEnabled = true
+            lastFrameTs = -1
+            avgFps = -1
             return
         }
 
@@ -206,7 +235,14 @@ class HighSpeedActivity : Activity() {
             val baseReq = reqBuilder.build()
             val reqList = session.createHighSpeedRequestList(baseReq)
             session.setRepeatingBurst(reqList, object : CameraCaptureSession.CaptureCallback() {
-                // nothing to override
+                override fun onCaptureCompleted(session: CameraCaptureSession, request: CaptureRequest, totalResult: TotalCaptureResult) {
+                    super.onCaptureCompleted(session, request, totalResult)
+
+                    // use totalResult timestamp for fps
+                    val ts = totalResult[CaptureResult.SENSOR_TIMESTAMP] ?: -1
+                    val fps = updateFps(ts)
+                    txtHighSpeedFps.text = "FPS: $fps"
+                }
             }, null)
 
             // start recording
