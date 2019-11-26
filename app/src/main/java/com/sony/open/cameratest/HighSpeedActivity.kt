@@ -203,6 +203,7 @@ class HighSpeedActivity : Activity() {
                 mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
                 mediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264)
                 mediaRecorder.setOutputFile(fileName)
+                mediaRecorder.setVideoFrameRate(size.second.lower)
                 mediaRecorder.setVideoSize(size.first.width, size.first.height)
                 mediaRecorder.setVideoEncodingBitRate((size.first.width*size.first.height*size.second.lower) / 15)
                 mediaRecorder.prepare()
