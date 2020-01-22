@@ -32,11 +32,25 @@
                 android:text="Enable preview"
                 android:checked="true" />
 
-            <CheckBox
-                android:id="@+id/chkHighSpeedRecording"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Allow recording" />
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <CheckBox
+                    android:id="@+id/chkHighSpeedRecording"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Allow recording" />
+
+                <CheckBox
+                    android:id="@+id/chkHighSpeedHdr"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"
+                    android:text="HDR" />
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/txtHighSpeedFps"

@@ -8,9 +8,10 @@ import android.app.Activity
 import android.content.Context
 import android.graphics.Point
 import android.hardware.camera2.*
-import android.media.MediaRecorder
+import android.media.*
 import android.os.Bundle
 import android.os.Environment
+import android.util.Log
 import android.util.Range
 import android.util.Size
 import android.view.Surface
@@ -28,6 +29,7 @@ class HighSpeedActivity : Activity() {
     private var cameraDevice : CameraDevice? = null
     private var cameraSession : CameraConstrainedHighSpeedCaptureSession? = null
     private var cameraId : String? = null
+    private var persistentSurface : Surface? = null
 
     private val fileName = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).absolutePath + "/CameraTest_HighSpeed.mp4"
 
@@ -65,6 +67,16 @@ class HighSpeedActivity : Activity() {
                     finish()
                     return@launch
                 }
+            }
+
+            // check HDR capability
+            val cc = cameraManager.getCameraCharacteristics(cameraId!!)
+            if (cc[CameraCharacteristics.CONTROL_AVAILABLE_SCENE_MODES]!!.contains(CameraCharacteristics.CONTROL_SCENE_MODE_HDR)) {
+                chkHighSpeedHdr.isEnabled = true
+                chkHighSpeedHdr.tag = true
+            } else {
+                chkHighSpeedHdr.isEnabled = false
+                chkHighSpeedHdr.tag = false
             }
         }
     }
@@ -130,6 +142,7 @@ class HighSpeedActivity : Activity() {
             // update UI and FPS state
             chkHighSpeedPreview.isEnabled = true
             chkHighSpeedRecording.isEnabled = true
+            chkHighSpeedHdr.isEnabled = chkHighSpeedHdr.tag as Boolean
             lastFrameTs = -1
             avgFps = -1
             return
@@ -197,7 +210,54 @@ class HighSpeedActivity : Activity() {
             }
 
             // prepare recording surface
-            if(chkHighSpeedRecording.isChecked) {
+            persistentSurface?.release()
+            if(chkHighSpeedRecording.isChecked && chkHighSpeedHdr.isChecked) {
+                // HDR needs low-level codec configuration
+                persistentSurface = MediaCodec.createPersistentInputSurface()
+
+                // configure format parameters for HEVC
+                val fmt = MediaFormat.createVideoFormat("video/hevc", size.first.width, size.first.height)
+                fmt.setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface)
+                fmt.setInteger(MediaFormat.KEY_BIT_RATE, (size.first.width*size.first.height*size.second.lower) / 15)
+                fmt.setInteger(MediaFormat.KEY_FRAME_RATE, size.second.lower)
+                fmt.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, 10)
+
+                fmt.setInteger(MediaFormat.KEY_PROFILE, MediaCodecInfo.CodecProfileLevel.HEVCProfileMain10HDR10)
+                fmt.setInteger(MediaFormat.KEY_LEVEL, MediaCodecInfo.CodecProfileLevel.HEVCMainTierLevel1)
+                fmt.setInteger(MediaFormat.KEY_COLOR_STANDARD, MediaFormat.COLOR_STANDARD_BT2020)
+                fmt.setInteger(MediaFormat.KEY_COLOR_TRANSFER, MediaFormat.COLOR_TRANSFER_HLG)
+                fmt.setInteger(MediaFormat.KEY_COLOR_RANGE, MediaFormat.COLOR_RANGE_LIMITED)
+
+                val cname = MediaCodecList(MediaCodecList.REGULAR_CODECS).findEncoderForFormat(fmt)
+                if (cname == null) {
+                    Log.e("CameraTest", "No suitable codec available.")
+                    return@launch
+                }
+
+                // configure codec
+                val codec = MediaCodec.createByCodecName(cname)
+                try {
+                    codec.configure(fmt, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE)
+                    codec.setInputSurface(persistentSurface!!)
+                } catch(e : Exception) {
+                    Log.e("CameraTest", "Failed to configure codec: ${e.localizedMessage}")
+                    return@launch
+                }
+
+                mediaRecorder.reset()
+                mediaRecorder.setVideoSource(MediaRecorder.VideoSource.SURFACE)
+                mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
+                mediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.HEVC)
+                mediaRecorder.setVideoEncodingProfileLevel(MediaCodecInfo.CodecProfileLevel.HEVCProfileMain10HDR10, MediaCodecInfo.CodecProfileLevel.HEVCMainTierLevel1)
+                mediaRecorder.setInputSurface(persistentSurface!!)
+                mediaRecorder.setOutputFile(fileName)
+                mediaRecorder.setVideoFrameRate(size.second.lower)
+                mediaRecorder.setVideoSize(size.first.width, size.first.height)
+                mediaRecorder.setVideoEncodingBitRate((size.first.width*size.first.height*size.second.lower) / 15)
+                surfaces.add(persistentSurface!!)
+
+            } else if(chkHighSpeedRecording.isChecked) {
+                // regular recording uses H.264
                 mediaRecorder.reset()
                 mediaRecorder.setVideoSource(MediaRecorder.VideoSource.SURFACE)
                 mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
@@ -208,6 +268,10 @@ class HighSpeedActivity : Activity() {
                 mediaRecorder.setVideoEncodingBitRate((size.first.width*size.first.height*size.second.lower) / 15)
                 mediaRecorder.prepare()
                 surfaces.add(mediaRecorder.surface)
+
+            } else {
+                // no recording
+                chkHighSpeedHdr.isChecked = false
             }
 
             // fail if no surfaces enabled
@@ -226,10 +290,25 @@ class HighSpeedActivity : Activity() {
             cameraSession = session
             chkHighSpeedPreview.isEnabled = false
             chkHighSpeedRecording.isEnabled = false
+            chkHighSpeedHdr.isEnabled = false
+
+            // for HDR, media recorder must be prepared after the camera session is ready
+            if (chkHighSpeedRecording.isChecked && chkHighSpeedHdr.isChecked) {
+                try {
+                    mediaRecorder.prepare()
+                } catch(e: Exception) {
+                    Log.e("CameraTest", "failed to prepare MediaRecorder")
+                    cameraHelper.closeCamera(device)
+                    return@launch
+                }
+            }
 
             // create repeating high speed request list
             val reqBuilder = device.createCaptureRequest(if (chkHighSpeedRecording.isChecked) CameraDevice.TEMPLATE_PREVIEW else CameraDevice.TEMPLATE_RECORD)
             reqBuilder.set(CaptureRequest.CONTROL_AE_TARGET_FPS_RANGE, size.second)
+            if (chkHighSpeedRecording.isChecked && chkHighSpeedHdr.isChecked) {
+                reqBuilder.set(CaptureRequest.CONTROL_SCENE_MODE, CaptureRequest.CONTROL_SCENE_MODE_HDR)
+            }
             for(s in surfaces) {
                 reqBuilder.addTarget(s)
             }
