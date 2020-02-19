@@ -15,6 +15,8 @@ import android.media.Image
 import android.media.ImageReader
 import android.media.ImageWriter
 import android.os.Bundle
+import android.os.Handler
+import android.os.HandlerThread
 import android.util.Log
 import android.util.Size
 import android.view.Surface
@@ -37,6 +39,7 @@ class ZslReprocessActivity : Activity() {
 
     private val cameraManager by lazy { getSystemService(Context.CAMERA_SERVICE) as CameraManager }
     private val cameraHelper by lazy { CameraHelper(cameraManager) }
+    private val jpegHandler = HandlerThread("JPEG Proc").apply { start() }
 
     private var cameraId: String? = null
     private var captureSize: Size? = null
@@ -169,7 +172,7 @@ class ZslReprocessActivity : Activity() {
                 super.onCaptureBufferLost(session, request, target, frameNumber)
                 Log.w(TAG, "reprocess lost buffer")
             }
-        }, null)
+        }, Handler(jpegHandler.looper))
     }
 
     /* Pop unprocessedMeta/unprocessedData and combine into unprocessedImages */
@@ -200,6 +203,9 @@ class ZslReprocessActivity : Activity() {
             if (img == null || meta == null)
                 continue
 
+            if (mainLooper.isCurrentThread)
+                Log.w(TAG, "Reading JPEG on main thread!")
+
             img.use {
                 if (img.format == ImageFormat.JPEG) {
                     val start = System.currentTimeMillis()
@@ -210,9 +216,11 @@ class ZslReprocessActivity : Activity() {
 
                     // decode and display
                     val bmpImage = BitmapFactory.decodeByteArray(jpegBytes, 0, jpegBytes.size)
-                    val ivThumbnail = findViewById<ImageView>(R.id.ivZslReprocessThumbnail)
-                    ivThumbnail.rotation = 90f
-                    ivThumbnail.setImageBitmap(bmpImage)
+                    runOnUiThread {
+                        val ivThumbnail = findViewById<ImageView>(R.id.ivZslReprocessThumbnail)
+                        ivThumbnail.rotation = 90f
+                        ivThumbnail.setImageBitmap(bmpImage)
+                    }
                     Log.i(TAG, "Decoding JPEG took ${(System.currentTimeMillis() - start)}ms")
                 } else {
                     Log.e(TAG, "format ${img.format} not supported")
@@ -256,7 +264,7 @@ class ZslReprocessActivity : Activity() {
             finalData.add(ir.acquireNextImage())
             Log.d(TAG, "irReprocess.onImageAvailable")
             processFinalImage()
-        }, null)
+        }, Handler(jpegHandler.looper))
         lSurfaces.add(irReprocess.surface)
 
         GlobalScope.launch(Dispatchers.Main) {
